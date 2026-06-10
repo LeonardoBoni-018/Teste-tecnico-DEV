@@ -23,5 +23,6 @@ Thumbs.db
 appsettings.*.local
 *.user
 *.secrets
+.env
 .env.local
 .env.*.local
