@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/api';
 
 export default function Login() {
   const [mode, setMode] = useState('login');
-  const [canRegister, setCanRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [nome, setNome] = useState('');
@@ -13,12 +12,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    authService.canRegister()
-      .then((res) => setCanRegister(res.data.canRegister))
-      .catch(() => {});
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -78,7 +71,7 @@ export default function Login() {
           <div className="login-logo">SL</div>
           <h1 className="login-title">Sistema de Gerenciamento</h1>
           <p className="login-subtitle">
-            {mode === 'login' ? 'Faça login para continuar' : 'Crie seu primeiro acesso'}
+            {mode === 'login' ? 'Faça login para continuar' : 'Crie sua conta'}
           </p>
         </div>
 
@@ -98,14 +91,12 @@ export default function Login() {
             <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
               {loading ? <span className="spinner-sm" /> : 'Entrar'}
             </button>
-            {canRegister && (
-              <p className="login-switch">
-                Primeiro acesso?{' '}
-                <button type="button" className="link-btn" onClick={switchMode}>
-                  Criar usuário
-                </button>
-              </p>
-            )}
+            <p className="login-switch">
+              Não tem conta?{' '}
+              <button type="button" className="link-btn" onClick={switchMode}>
+                Registrar-se
+              </button>
+            </p>
           </form>
         ) : (
           <form className="login-form" onSubmit={handleRegister} noValidate>
