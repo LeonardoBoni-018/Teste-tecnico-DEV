@@ -33,9 +33,6 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        if (await _context.Usuarios.AnyAsync())
-            return BadRequest(new { message = "Já existe um usuário cadastrado" });
-
         if (await _context.Usuarios.AnyAsync(u => u.Username == request.Username))
             return BadRequest(new { message = "Este nome de usuário já está em uso" });
 
