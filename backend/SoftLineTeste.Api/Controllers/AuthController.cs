@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SoftLineTeste.Api.Data;
 using SoftLineTeste.Api.DTOs;
+using SoftLineTeste.Api.Models;
 using SoftLineTeste.Api.Services;
 
 namespace SoftLineTeste.Api.Controllers;
@@ -20,6 +21,43 @@ public class AuthController : ControllerBase
         _context = context;
         _tokenService = tokenService;
         _logger = logger;
+    }
+
+    [HttpGet("can-register")]
+    public async Task<IActionResult> CanRegister()
+    {
+        var hasUsers = await _context.Usuarios.AnyAsync();
+        return Ok(new { canRegister = !hasUsers });
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        if (await _context.Usuarios.AnyAsync())
+            return BadRequest(new { message = "Já existe um usuário cadastrado" });
+
+        if (await _context.Usuarios.AnyAsync(u => u.Username == request.Username))
+            return BadRequest(new { message = "Este nome de usuário já está em uso" });
+
+        var usuario = new Usuario
+        {
+            Username = request.Username,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Nome = request.Nome
+        };
+
+        _context.Usuarios.Add(usuario);
+        await _context.SaveChangesAsync();
+
+        var (token, expiresAt) = _tokenService.GenerateToken(usuario);
+        _logger.LogInformation("First user {Username} registered successfully", request.Username);
+
+        return Ok(new LoginResponse
+        {
+            Token = token,
+            Nome = usuario.Nome,
+            ExpiresAt = expiresAt
+        });
     }
 
     [HttpPost("login")]

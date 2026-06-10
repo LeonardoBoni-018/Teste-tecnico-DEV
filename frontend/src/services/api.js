@@ -29,6 +29,8 @@ api.interceptors.response.use(
 export const authService = {
   login: (data) => api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
+  canRegister: () => api.get('/auth/can-register'),
+  register: (data) => api.post('/auth/register', data),
 };
 
 export const produtosService = {
