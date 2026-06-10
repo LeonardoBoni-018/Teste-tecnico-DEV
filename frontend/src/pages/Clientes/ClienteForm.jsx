@@ -29,8 +29,8 @@ function validateDocument(value) {
 export default function ClienteForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isEditinging = window.location.pathname.endsWith('/editar');
-  const isView = Boolean(id) && !isEditinging;
+  const isEditing = window.location.pathname.endsWith('/editar');
+  const isView = Boolean(id) && !isEditing;
 
   const [formData, setFormData] = useState({
     codigo: '',

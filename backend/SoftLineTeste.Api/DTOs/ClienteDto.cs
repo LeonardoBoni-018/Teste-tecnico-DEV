@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SoftLineTeste.Api.Validators;
 
 namespace SoftLineTeste.Api.DTOs;
 
@@ -17,10 +18,11 @@ public class ClienteRequest
     public string Fantasia { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Documento é obrigatório")]
-    [MaxLength(20, ErrorMessage = "Documento inválido")]
+    [CpfCnpj]
     public string Documento { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Endereço é obrigatório")]
+    [MaxLength(500, ErrorMessage = "Endereço deve ter no máximo 500 caracteres")]
     public string Endereco { get; set; } = string.Empty;
 }
 

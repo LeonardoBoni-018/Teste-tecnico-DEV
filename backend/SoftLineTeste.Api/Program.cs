@@ -8,17 +8,29 @@ using SoftLineTeste.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
+    ?? builder.Configuration["Jwt:Key"];
+
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(jwtKey))
+    throw new InvalidOperationException("JWT_KEY environment variable is not set");
+
+if (string.IsNullOrEmpty(connectionString))
+    throw new InvalidOperationException("DB_CONNECTION_STRING environment variable is not set");
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+    options.UseMySql(connectionString,
+        ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddScoped<TokenService>();
 
-var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -39,12 +51,19 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+              .WithHeaders("Authorization", "Content-Type")
+              .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     });
 });
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
+app.UseSecurityHeaders();
+
+app.UseMiddleware<RateLimiterMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

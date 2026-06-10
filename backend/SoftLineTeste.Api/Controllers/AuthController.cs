@@ -13,11 +13,13 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly TokenService _tokenService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(AppDbContext context, TokenService tokenService)
+    public AuthController(AppDbContext context, TokenService tokenService, ILogger<AuthController> logger)
     {
         _context = context;
         _tokenService = tokenService;
+        _logger = logger;
     }
 
     [HttpPost("login")]
@@ -27,9 +29,13 @@ public class AuthController : ControllerBase
             .FirstOrDefaultAsync(u => u.Username == request.Username);
 
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.PasswordHash))
+        {
+            _logger.LogWarning("Failed login attempt for user: {Username}", request.Username);
             return Unauthorized(new { message = "Usuário ou senha inválidos" });
+        }
 
         var (token, expiresAt) = _tokenService.GenerateToken(usuario);
+        _logger.LogInformation("User {Username} logged in successfully", request.Username);
 
         return Ok(new LoginResponse
         {

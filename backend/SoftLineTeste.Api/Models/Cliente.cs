@@ -17,7 +17,7 @@ public class Cliente
     [Required, MaxLength(20)]
     public string Documento { get; set; } = string.Empty;
 
-    [Required]
+    [Required, MaxLength(500)]
     public string Endereco { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

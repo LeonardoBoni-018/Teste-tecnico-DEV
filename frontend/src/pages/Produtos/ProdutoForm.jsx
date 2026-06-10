@@ -6,8 +6,8 @@ import Toast from '../../components/Toast';
 export default function ProdutoForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isEditinging = window.location.pathname.endsWith('/editar');
-  const isView = Boolean(id) && !isEditinging;
+  const isEditing = window.location.pathname.endsWith('/editar');
+  const isView = Boolean(id) && !isEditing;
 
   const [formData, setFormData] = useState({
     codigo: '',
