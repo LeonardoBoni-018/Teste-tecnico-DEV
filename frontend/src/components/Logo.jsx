@@ -23,7 +23,7 @@ export default function Logo({ size = 36, showText = true }) {
           lineHeight: 1,
           letterSpacing: '-0.3px',
         }}>
-          SoftLine
+          NovaGest
         </span>
       )}
     </div>

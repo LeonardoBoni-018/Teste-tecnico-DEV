@@ -24,7 +24,7 @@ describe('Navbar', () => {
 
   it('renders brand name', () => {
     renderNavbar();
-    expect(screen.getByText('SoftLine')).toBeInTheDocument();
+    expect(screen.getByText('NovaGest')).toBeInTheDocument();
   });
 
   it('renders navigation links', () => {
