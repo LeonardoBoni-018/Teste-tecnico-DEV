@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/api';
+import Logo from '../components/Logo';
 
 export default function Login() {
   const [mode, setMode] = useState('login');
@@ -68,7 +69,7 @@ export default function Login() {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <div className="login-logo">SL</div>
+          <div className="login-logo"><Logo size={72} showText={false} /></div>
           <h1 className="login-title">Sistema de Gerenciamento</h1>
           <p className="login-subtitle">
             {mode === 'login' ? 'Faça login para continuar' : 'Crie sua conta'}
