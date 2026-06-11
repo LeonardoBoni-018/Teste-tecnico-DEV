@@ -1,9 +1,29 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { produtosService, clientesService } from '../services/api';
+import { Grid, Card, CardContent, Box } from '@mui/material';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import PeopleIcon from '@mui/icons-material/People';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState({ produtos: 0, clientes: 0 });
+
+  useEffect(() => {
+    Promise.all([
+      produtosService.getAll(),
+      clientesService.getAll()
+    ]).then(([produtosRes, clientesRes]) => {
+      setStats({
+        produtos: produtosRes.data.length,
+        clientes: clientesRes.data.length
+      });
+    }).catch(() => {});
+  }, []);
+
+  const total = stats.produtos + stats.clientes;
 
   return (
     <div className="page-container">
@@ -11,6 +31,108 @@ export default function Dashboard() {
         <h1 className="page-title">Dashboard</h1>
         <p className="page-subtitle">Bem-vindo, {user?.nome}!</p>
       </div>
+
+      <Box sx={{ mb: 4 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={{
+                bgcolor: 'var(--surface)',
+                borderRadius: 'var(--radius)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--border)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  boxShadow: 'var(--shadow)',
+                  borderColor: 'var(--primary)',
+                  transform: 'translateY(-2px)'
+                }
+              }}
+            >
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <div className="dash-card-icon dash-icon-products" style={{ margin: '0 auto 12px' }}>
+                  <InventoryIcon />
+                </div>
+                <h3 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  {stats.produtos}
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                  Produtos cadastrados
+                </p>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={{
+                bgcolor: 'var(--surface)',
+                borderRadius: 'var(--radius)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--border)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  boxShadow: 'var(--shadow)',
+                  borderColor: 'var(--secondary)',
+                  transform: 'translateY(-2px)'
+                }
+              }}
+            >
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <div className="dash-card-icon dash-icon-clients" style={{ margin: '0 auto 12px' }}>
+                  <PeopleIcon />
+                </div>
+                <h3 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  {stats.clientes}
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                  Clientes cadastrados
+                </p>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={{
+                bgcolor: 'var(--surface)',
+                borderRadius: 'var(--radius)',
+                boxShadow: 'var(--shadow-sm)',
+                border: '1px solid var(--border)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  boxShadow: 'var(--shadow)',
+                  borderColor: 'var(--text-muted)',
+                  transform: 'translateY(-2px)'
+                }
+              }}
+            >
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <div className="dash-card-icon" style={{
+                  margin: '0 auto 12px',
+                  background: 'var(--primary-light)',
+                  color: 'var(--primary)',
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </div>
+                <h3 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                  {total}
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                  Total de registros
+                </p>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+
       <div className="dashboard-cards">
         <div className="dash-card" onClick={() => navigate('/produtos')}>
           <div className="dash-card-icon dash-icon-products">
