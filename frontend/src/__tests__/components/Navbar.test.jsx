@@ -1,15 +1,18 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AuthProvider } from '../../context/AuthContext';
+import { ThemeProvider } from '../../context/ThemeContext';
 import Navbar from '../../components/Navbar';
 
 function renderNavbar() {
   return render(
     <MemoryRouter initialEntries={['/dashboard']}>
-      <AuthProvider>
-        <Navbar />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Navbar />
+        </AuthProvider>
+      </ThemeProvider>
     </MemoryRouter>
   );
 }

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
@@ -25,84 +26,86 @@ function AppLayout({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <AppLayout><Dashboard /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/produtos"
-            element={
-              <PrivateRoute>
-                <AppLayout><ProdutoList /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/produtos/novo"
-            element={
-              <PrivateRoute>
-                <AppLayout><ProdutoForm /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/produtos/:id"
-            element={
-              <PrivateRoute>
-                <AppLayout><ProdutoForm /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/produtos/:id/editar"
-            element={
-              <PrivateRoute>
-                <AppLayout><ProdutoForm /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/clientes"
-            element={
-              <PrivateRoute>
-                <AppLayout><ClienteList /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/clientes/novo"
-            element={
-              <PrivateRoute>
-                <AppLayout><ClienteForm /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/clientes/:id"
-            element={
-              <PrivateRoute>
-                <AppLayout><ClienteForm /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/clientes/:id/editar"
-            element={
-              <PrivateRoute>
-                <AppLayout><ClienteForm /></AppLayout>
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <AppLayout><Dashboard /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/produtos"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ProdutoList /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/produtos/novo"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ProdutoForm /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/produtos/:id"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ProdutoForm /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/produtos/:id/editar"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ProdutoForm /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/clientes"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ClienteList /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/clientes/novo"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ClienteForm /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/clientes/:id"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ClienteForm /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/clientes/:id/editar"
+              element={
+                <PrivateRoute>
+                  <AppLayout><ClienteForm /></AppLayout>
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
