@@ -61,7 +61,7 @@ describe('ProdutoForm validation', () => {
     await waitFor(() => {
       expect(screen.getByText('Código deve ser um número positivo')).toBeInTheDocument();
       expect(screen.getByText('Descrição é obrigatória')).toBeInTheDocument();
-      expect(screen.getByText('Código de Barras é obrigatório')).toBeInTheDocument();
+      expect(screen.getByText('Código de barras é obrigatório')).toBeInTheDocument();
     });
   });
 

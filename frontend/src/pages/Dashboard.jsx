@@ -9,22 +9,26 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ produtos: 0, clientes: 0 });
   const [recentProdutos, setRecentProdutos] = useState([]);
   const [recentClientes, setRecentClientes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      produtosService.getAll(),
-      clientesService.getAll()
-    ]).then(([produtosRes, clientesRes]) => {
-      const produtos = produtosRes.data;
-      const clientes = clientesRes.data;
-      setStats({ produtos: produtos.length, clientes: clientes.length });
-      setRecentProdutos([...produtos].slice(-5).reverse());
-      setRecentClientes([...clientes].slice(-5).reverse());
-    }).catch(() => {}).finally(() => setLoading(false));
+    const load = async () => {
+      try {
+        const [produtosRes, clientesRes] = await Promise.all([
+          produtosService.getAll(),
+          clientesService.getAll()
+        ]);
+        const produtos = produtosRes.data;
+        const clientes = clientesRes.data;
+        setRecentProdutos([...produtos].slice(-5).reverse());
+        setRecentClientes([...clientes].slice(-5).reverse());
+      } catch { /* empty */ } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const formatCurrency = (value) =>

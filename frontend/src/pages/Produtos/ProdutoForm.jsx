@@ -2,6 +2,34 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { produtosService } from '../../services/api';
 import Toast from '../../components/Toast';
+import {
+  Box, Card, Typography, Button, TextField, InputAdornment,
+  Divider, CircularProgress, Skeleton,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
+import TagIcon from '@mui/icons-material/Tag';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ScaleIcon from '@mui/icons-material/Scale';
+
+const fieldSx = (hasError) => ({
+  '& .MuiOutlinedInput-root': {
+    bgcolor: 'var(--surface-hover)',
+    borderRadius: '10px',
+    color: 'var(--text-primary)',
+    fontSize: 14,
+    '& fieldset': { borderColor: hasError ? 'var(--error)' : 'var(--border)' },
+    '&:hover fieldset': { borderColor: hasError ? 'var(--error)' : 'var(--border-focus)' },
+    '&.Mui-focused fieldset': { borderColor: hasError ? 'var(--error)' : 'var(--primary)', borderWidth: 2 },
+    '&.Mui-disabled': { bgcolor: 'var(--surface)', opacity: 0.7 },
+  },
+  '& .MuiInputLabel-root': { color: 'var(--text-secondary)', fontSize: 13 },
+  '& .MuiInputLabel-root.Mui-focused': { color: 'var(--primary)' },
+  '& .MuiFormHelperText-root': { color: 'var(--error)', fontSize: 11.5, mx: 0 },
+  '& .MuiInputAdornment-root svg': { color: 'var(--text-muted)', fontSize: 18 },
+});
 
 export default function ProdutoForm() {
   const { id } = useParams();
@@ -10,32 +38,22 @@ export default function ProdutoForm() {
   const isView = Boolean(id) && !isEditing;
 
   const [formData, setFormData] = useState({
-    codigo: '',
-    descricao: '',
-    codigoBarras: '',
-    valorVenda: '',
-    pesoBruto: '',
-    pesoLiquido: '',
+    codigo: '', descricao: '', codigoBarras: '',
+    valorVenda: '', pesoBruto: '', pesoLiquido: '',
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => !!id);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (id) {
-      setLoading(true);
-      produtosService
-        .getById(id)
-        .then((response) => {
-          const p = response.data;
+      produtosService.getById(id)
+        .then((res) => {
+          const p = res.data;
           setFormData({
-            codigo: p.codigo,
-            descricao: p.descricao,
-            codigoBarras: p.codigoBarras,
-            valorVenda: p.valorVenda,
-            pesoBruto: p.pesoBruto,
-            pesoLiquido: p.pesoLiquido,
+            codigo: p.codigo, descricao: p.descricao, codigoBarras: p.codigoBarras,
+            valorVenda: p.valorVenda, pesoBruto: p.pesoBruto, pesoLiquido: p.pesoLiquido,
           });
         })
         .catch(() => setToast({ type: 'error', message: 'Erro ao carregar produto' }))
@@ -50,23 +68,22 @@ export default function ProdutoForm() {
   };
 
   const validate = () => {
-    const newErrors = {};
-    if (!formData.codigo || Number(formData.codigo) <= 0) newErrors.codigo = 'Código deve ser um número positivo';
-    if (!formData.descricao.trim()) newErrors.descricao = 'Descrição é obrigatória';
-    else if (formData.descricao.length > 60) newErrors.descricao = 'Máximo 60 caracteres';
-    if (!formData.codigoBarras.trim()) newErrors.codigoBarras = 'Código de Barras é obrigatório';
-    else if (formData.codigoBarras.length > 14) newErrors.codigoBarras = 'Máximo 14 caracteres';
-    if (!formData.valorVenda || Number(formData.valorVenda) <= 0) newErrors.valorVenda = 'Valor deve ser maior que zero';
-    if (!formData.pesoBruto || Number(formData.pesoBruto) <= 0) newErrors.pesoBruto = 'Peso deve ser maior que zero';
-    if (!formData.pesoLiquido || Number(formData.pesoLiquido) <= 0) newErrors.pesoLiquido = 'Peso deve ser maior que zero';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const e = {};
+    if (!formData.codigo || Number(formData.codigo) <= 0) e.codigo = 'Código deve ser um número positivo';
+    if (!formData.descricao.trim()) e.descricao = 'Descrição é obrigatória';
+    else if (formData.descricao.length > 60) e.descricao = 'Máximo 60 caracteres';
+    if (!formData.codigoBarras.trim()) e.codigoBarras = 'Código de barras é obrigatório';
+    else if (formData.codigoBarras.length > 14) e.codigoBarras = 'Máximo 14 caracteres';
+    if (!formData.valorVenda || Number(formData.valorVenda) <= 0) e.valorVenda = 'Valor deve ser maior que zero';
+    if (!formData.pesoBruto || Number(formData.pesoBruto) <= 0) e.pesoBruto = 'Peso deve ser maior que zero';
+    if (!formData.pesoLiquido || Number(formData.pesoLiquido) <= 0) e.pesoLiquido = 'Peso deve ser maior que zero';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     const data = {
       ...formData,
       codigo: Number(formData.codigo),
@@ -74,7 +91,6 @@ export default function ProdutoForm() {
       pesoBruto: Number(formData.pesoBruto),
       pesoLiquido: Number(formData.pesoLiquido),
     };
-
     setSaving(true);
     try {
       if (isEditing) {
@@ -86,141 +102,196 @@ export default function ProdutoForm() {
       }
       setTimeout(() => navigate('/produtos'), 1000);
     } catch (err) {
-      const message = err.response?.data?.message || 'Erro ao salvar produto';
-      setToast({ type: 'error', message });
+      setToast({ type: 'error', message: err.response?.data?.message || 'Erro ao salvar produto' });
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="page-container">
-        <div className="loading-container">
-          <div className="spinner" />
-        </div>
-      </div>
-    );
-  }
+  const modeLabel = isView ? 'Visualizar' : isEditing ? 'Editar' : 'Novo';
+  const modeColor = isView ? 'var(--secondary)' : isEditing ? 'var(--warning)' : 'var(--primary)';
 
   return (
     <div className="page-container">
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
 
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">{isView ? 'Visualizar' : isEditing ? 'Editar' : 'Novo'} Produto</h1>
-          <p className="page-subtitle">Preencha os dados do produto</p>
-        </div>
-      </div>
+      {/* Header */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/produtos')}
+          sx={{
+            color: 'var(--text-secondary)', textTransform: 'none', fontWeight: 500, fontSize: 13,
+            '&:hover': { color: 'var(--primary)', bgcolor: 'var(--primary-light)' },
+          }}
+        >
+          Produtos
+        </Button>
+        <Typography sx={{ color: 'var(--text-muted)' }}>/</Typography>
+        <Typography sx={{ fontSize: 13, color: modeColor, fontWeight: 600 }}>{modeLabel}</Typography>
+      </Box>
 
-      <div className="form-card">
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Código</label>
-              <input
-                type="number"
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 24 }}>
+            {modeLabel} Produto
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', mt: 0.5 }}>
+            {isView ? 'Visualizando dados do produto' : 'Preencha os dados do produto abaixo'}
+          </Typography>
+        </Box>
+        {isView && (
+          <Button
+            startIcon={<EditIcon />}
+            onClick={() => navigate(`/produtos/${id}/editar`)}
+            variant="outlined"
+            sx={{
+              borderColor: 'var(--primary)', color: 'var(--primary)', borderRadius: '10px',
+              textTransform: 'none', fontWeight: 600,
+              '&:hover': { bgcolor: 'var(--primary-light)', borderColor: 'var(--primary)' },
+            }}
+          >
+            Editar
+          </Button>
+        )}
+      </Box>
+
+      {loading ? (
+        <Card sx={{ bgcolor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', p: 3 }}>
+          {[...Array(5)].map((_, i) => <Skeleton key={i} height={56} sx={{ bgcolor: 'var(--surface-hover)', mb: 1.5, borderRadius: 1 }} />)}
+        </Card>
+      ) : (
+        <Card sx={{
+          bgcolor: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)',
+        }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid var(--border)' }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Identificação
+            </Typography>
+          </Box>
+
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2.5, mb: 2.5 }}>
+              <TextField
+                label="Código"
                 name="codigo"
-                className={`form-input ${errors.codigo ? 'input-error' : ''}`}
+                type="number"
                 value={formData.codigo}
                 onChange={handleChange}
                 disabled={isView}
-                min="1"
+                error={Boolean(errors.codigo)}
+                helperText={errors.codigo}
+                inputProps={{ min: 1 }}
+                InputProps={{ startAdornment: <InputAdornment position="start"><TagIcon /></InputAdornment> }}
+                sx={fieldSx(errors.codigo)}
               />
-              {errors.codigo && <span className="field-error">{errors.codigo}</span>}
-            </div>
-            <div className="form-group">
-              <label className="form-label">Código de Barras</label>
-              <input
-                type="text"
+              <TextField
+                label="Código de Barras"
                 name="codigoBarras"
-                className={`form-input mono ${errors.codigoBarras ? 'input-error' : ''}`}
                 value={formData.codigoBarras}
-                onChange={(e) => {
-                  if (e.target.value.length <= 14) handleChange(e);
-                }}
+                onChange={(e) => { if (e.target.value.length <= 14) handleChange(e); }}
                 disabled={isView}
-                maxLength={14}
+                error={Boolean(errors.codigoBarras)}
+                helperText={errors.codigoBarras || `${formData.codigoBarras.length}/14 caracteres`}
+                inputProps={{ maxLength: 14 }}
+                InputProps={{ startAdornment: <InputAdornment position="start"><QrCodeIcon /></InputAdornment> }}
+                sx={fieldSx(errors.codigoBarras)}
               />
-              {errors.codigoBarras && <span className="field-error">{errors.codigoBarras}</span>}
-            </div>
-          </div>
+            </Box>
 
-          <div className="form-group">
-            <label className="form-label">Descrição</label>
-            <input
-              type="text"
+            <TextField
+              fullWidth
+              label="Descrição"
               name="descricao"
-              className={`form-input ${errors.descricao ? 'input-error' : ''}`}
               value={formData.descricao}
-              onChange={(e) => {
-                if (e.target.value.length <= 60) handleChange(e);
-              }}
+              onChange={(e) => { if (e.target.value.length <= 60) handleChange(e); }}
               disabled={isView}
-              maxLength={60}
+              error={Boolean(errors.descricao)}
+              helperText={errors.descricao || `${formData.descricao.length}/60 caracteres`}
+              inputProps={{ maxLength: 60 }}
+              sx={{ ...fieldSx(errors.descricao), mb: 2.5 }}
             />
-            <span className="char-counter">{formData.descricao.length}/60</span>
-            {errors.descricao && <span className="field-error">{errors.descricao}</span>}
-          </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Valor de Venda (R$)</label>
-              <input
-                type="number"
+            <Divider sx={{ borderColor: 'var(--border)', mb: 2.5 }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', mb: 2.5 }}>
+              Valores e Pesos
+            </Typography>
+
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2.5 }}>
+              <TextField
+                label="Valor de Venda"
                 name="valorVenda"
-                className={`form-input ${errors.valorVenda ? 'input-error' : ''}`}
+                type="number"
                 value={formData.valorVenda}
                 onChange={handleChange}
                 disabled={isView}
-                step="0.01"
-                min="0.01"
+                error={Boolean(errors.valorVenda)}
+                helperText={errors.valorVenda}
+                inputProps={{ step: 0.01, min: 0.01 }}
+                InputProps={{ startAdornment: <InputAdornment position="start"><AttachMoneyIcon /></InputAdornment> }}
+                sx={fieldSx(errors.valorVenda)}
               />
-              {errors.valorVenda && <span className="field-error">{errors.valorVenda}</span>}
-            </div>
-            <div className="form-group">
-              <label className="form-label">Peso Bruto (kg)</label>
-              <input
-                type="number"
+              <TextField
+                label="Peso Bruto (kg)"
                 name="pesoBruto"
-                className={`form-input ${errors.pesoBruto ? 'input-error' : ''}`}
+                type="number"
                 value={formData.pesoBruto}
                 onChange={handleChange}
                 disabled={isView}
-                step="0.001"
-                min="0.001"
+                error={Boolean(errors.pesoBruto)}
+                helperText={errors.pesoBruto}
+                inputProps={{ step: 0.001, min: 0.001 }}
+                InputProps={{ startAdornment: <InputAdornment position="start"><ScaleIcon /></InputAdornment> }}
+                sx={fieldSx(errors.pesoBruto)}
               />
-              {errors.pesoBruto && <span className="field-error">{errors.pesoBruto}</span>}
-            </div>
-            <div className="form-group">
-              <label className="form-label">Peso Líquido (kg)</label>
-              <input
-                type="number"
+              <TextField
+                label="Peso Líquido (kg)"
                 name="pesoLiquido"
-                className={`form-input ${errors.pesoLiquido ? 'input-error' : ''}`}
+                type="number"
                 value={formData.pesoLiquido}
                 onChange={handleChange}
                 disabled={isView}
-                step="0.001"
-                min="0.001"
+                error={Boolean(errors.pesoLiquido)}
+                helperText={errors.pesoLiquido}
+                inputProps={{ step: 0.001, min: 0.001 }}
+                InputProps={{ startAdornment: <InputAdornment position="start"><ScaleIcon /></InputAdornment> }}
+                sx={fieldSx(errors.pesoLiquido)}
               />
-              {errors.pesoLiquido && <span className="field-error">{errors.pesoLiquido}</span>}
-            </div>
-          </div>
+            </Box>
 
-          <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => navigate('/produtos')}>
-              Voltar
-            </button>
-            {!isView && (
-              <button type="submit" className="btn btn-primary" disabled={saving}>
-                {saving ? <span className="spinner-sm" /> : isEditing ? 'Atualizar' : 'Cadastrar'}
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
+            {/* Actions */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1.5, mt: 3.5, pt: 2.5, borderTop: '1px solid var(--border)' }}>
+              <Button
+                onClick={() => navigate('/produtos')}
+                sx={{
+                  color: 'var(--text-secondary)', borderRadius: '10px', textTransform: 'none',
+                  fontWeight: 600, border: '1px solid var(--border)', px: 2.5,
+                  '&:hover': { bgcolor: 'var(--surface-hover)' },
+                }}
+              >
+                Voltar
+              </Button>
+              {!isView && (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={saving}
+                  startIcon={saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
+                  sx={{
+                    bgcolor: 'var(--primary)', color: '#fff', borderRadius: '10px',
+                    textTransform: 'none', fontWeight: 600, px: 2.5, boxShadow: 'none',
+                    '&:hover': { bgcolor: 'var(--primary-hover)', boxShadow: 'none' },
+                    '&:disabled': { opacity: 0.7 },
+                  }}
+                >
+                  {saving ? 'Salvando...' : isEditing ? 'Atualizar' : 'Cadastrar'}
+                </Button>
+              )}
+            </Box>
+          </Box>
+        </Card>
+      )}
     </div>
   );
 }

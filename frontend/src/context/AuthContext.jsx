@@ -1,27 +1,24 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.token && new Date(parsed.expiresAt) > new Date()) {
-          setUser(parsed);
-        } else {
-          localStorage.removeItem('user');
-        }
-      } catch {
-        localStorage.removeItem('user');
-      }
+function getInitialUser() {
+  const stored = localStorage.getItem('user');
+  if (!stored) return null;
+  try {
+    const parsed = JSON.parse(stored);
+    if (parsed.token && new Date(parsed.expiresAt) > new Date()) {
+      return parsed;
     }
-    setLoading(false);
-  }, []);
+  } catch { /* empty */ }
+  localStorage.removeItem('user');
+  return null;
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(getInitialUser);
+  const [loading] = useState(false);
 
   const login = (data) => {
     const userData = {
