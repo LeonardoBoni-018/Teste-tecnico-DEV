@@ -1,7 +1,3 @@
-/* ============================================
-   NovaGest - Global Styles (Light/Dark Theme)
-   ============================================ */
-
 :root,
 [data-theme="light"] {
   --bg: #F8FAFC;
@@ -898,4 +894,124 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* ========== DASHBOARD RECENTES ========== */
+
+.dash-recent-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .dash-recent-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dash-recent-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.dash-recent-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-recent-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.dash-recent-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s ease;
+}
+
+.dash-recent-link:hover {
+  opacity: 0.75;
+}
+
+.dash-recent-list {
+  padding: 8px 0;
+}
+
+.dash-recent-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  gap: 12px;
+  transition: background 0.15s ease;
+}
+
+.dash-recent-item:hover {
+  background: var(--surface-hover);
+}
+
+.dash-recent-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dash-recent-item-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-recent-item-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-recent-item-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dash-badge-primary {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.dash-badge-secondary {
+  background: var(--secondary-light);
+  color: var(--secondary);
+}
+
+.dash-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 20px;
 }
