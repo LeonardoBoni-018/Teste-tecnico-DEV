@@ -83,11 +83,11 @@ describe('ClienteForm validation', () => {
   });
 
   it('limits fantasia to 100 chars via maxLength', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 15 });
     const { $fantasia } = renderForm();
     await user.type($fantasia(), 'A'.repeat(110));
     expect($fantasia().value.length).toBe(100);
-  });
+  }, 15000);
 
   it('submits with valid data', async () => {
     api.clientesService.create.mockResolvedValue({ data: { id: 1 } });

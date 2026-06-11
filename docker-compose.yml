@@ -1,0 +1,49 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: novagest-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: SoftLineTeste
+    ports:
+      - "3305:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/01_CreateDatabase.sql:/docker-entrypoint-initdb.d/01_CreateDatabase.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build: ./backend/SoftLineTeste.Api
+    container_name: novagest-backend
+    restart: unless-stopped
+    ports:
+      - "5144:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      DB_CONNECTION_STRING: Server=db;Port=3306;Database=SoftLineTeste;User=root;Password=root;
+      JWT_KEY: SoftLineTesteSuperSecretKeyForJwtToken2026!@#$%
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api
+    container_name: novagest-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
