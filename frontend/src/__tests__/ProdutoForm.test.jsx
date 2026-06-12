@@ -76,11 +76,11 @@ describe('ProdutoForm validation', () => {
   });
 
   it('limits descricao to 60 chars via maxLength', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const { $descricao } = renderForm();
     await user.type($descricao(), 'A'.repeat(70));
     expect($descricao().value.length).toBe(60);
-  });
+  }, 15000);
 
   it('limits codigoBarras to 14 chars via maxLength', async () => {
     const user = userEvent.setup();

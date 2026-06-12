@@ -57,17 +57,17 @@ describe('Login Page', () => {
     });
   });
 
-  it('shows error when register password is less than 6 chars', async () => {
+  it('shows error when register password is less than 8 chars', async () => {
     renderLogin();
     fireEvent.click(screen.getByText('Registrar-se'));
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
-    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), '12345');
-    await user.type(screen.getByPlaceholderText('Repita a senha'), '12345');
+    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'Ab@1');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), 'Ab@1');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
-      expect(screen.getByText('Senha deve ter no mínimo 6 caracteres')).toBeInTheDocument();
+      expect(screen.getByText('Senha deve ter no mínimo 8 caracteres')).toBeInTheDocument();
     });
   });
 
@@ -77,11 +77,25 @@ describe('Login Page', () => {
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
-    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), '123456');
-    await user.type(screen.getByPlaceholderText('Repita a senha'), '654321');
+    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'Admin@123');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), 'Admin@456');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
       expect(screen.getByText('As senhas informadas não conferem')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error when password lacks complexity requirements', async () => {
+    renderLogin();
+    fireEvent.click(screen.getByText('Registrar-se'));
+    const user = userEvent.setup();
+    await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
+    await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
+    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'abcdefgh');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), 'abcdefgh');
+    fireEvent.click(screen.getByText('Criar Acesso'));
+    await waitFor(() => {
+      expect(screen.getByText('Senha deve conter letra maiúscula, minúscula, número e caractere especial')).toBeInTheDocument();
     });
   });
 
@@ -99,11 +113,11 @@ describe('Login Page', () => {
     api.authService.login.mockResolvedValue({ data: { token: 'abc', nome: 'User', expiresAt: new Date(Date.now() + 3600000).toISOString() } });
     const user = userEvent.setup();
     renderLogin();
-    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin');
-    await user.type(screen.getByPlaceholderText('Digite sua senha'), '123456');
+    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin@email.com');
+    await user.type(screen.getByPlaceholderText('Digite sua senha'), 'Admin@123');
     fireEvent.click(screen.getByText('Entrar'));
     await waitFor(() => {
-      expect(api.authService.login).toHaveBeenCalledWith({ username: 'admin', password: '123456' });
+      expect(api.authService.login).toHaveBeenCalledWith({ username: 'admin@email.com', password: 'Admin@123' });
     });
   });
 
@@ -111,7 +125,7 @@ describe('Login Page', () => {
     api.authService.login.mockRejectedValue({ response: { data: { message: 'Usuário ou senha inválidos' } } });
     const user = userEvent.setup();
     renderLogin();
-    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin');
+    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin@email.com');
     await user.type(screen.getByPlaceholderText('Digite sua senha'), 'wrong');
     fireEvent.click(screen.getByText('Entrar'));
     await waitFor(() => {
@@ -126,11 +140,11 @@ describe('Login Page', () => {
     fireEvent.click(screen.getByText('Registrar-se'));
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'New User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'newuser');
-    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), '123456');
-    await user.type(screen.getByPlaceholderText('Repita a senha'), '123456');
+    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'Admin@123');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), 'Admin@123');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
-      expect(api.authService.register).toHaveBeenCalledWith({ username: 'newuser', password: '123456', nome: 'New User' });
+      expect(api.authService.register).toHaveBeenCalledWith({ username: 'newuser', password: 'Admin@123', nome: 'New User' });
     });
   });
 });

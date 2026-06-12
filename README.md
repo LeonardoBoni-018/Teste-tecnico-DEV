@@ -12,6 +12,7 @@ Aplicação full stack para cadastro de produtos e clientes com autenticação J
 | Backend | C# / .NET 8 Web API (EF Core, JWT) |
 | Banco | MySQL 8.0 |
 | Autenticação | JWT Bearer + BCrypt |
+| Validações | CPF/CNPJ, complexidade de senha (maiúscula, minúscula, número, especial) |
 | Testes | xUnit (backend) + Vitest (frontend) |
 | Docker | docker compose (banco + backend + frontend) |
 
@@ -68,7 +69,7 @@ npm run dev
 
 ### Login padrão
 
-**admin** / **admin123** (criado automaticamente na primeira execução)
+**admin@email.com** / **Admin@123** (criado automaticamente na primeira execução)
 
 ## Testes
 

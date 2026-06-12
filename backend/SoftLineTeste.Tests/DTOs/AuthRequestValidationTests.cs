@@ -47,7 +47,7 @@ public class AuthRequestValidationTests
     [Fact]
     public void LoginRequest_Username_ShouldPass_When3OrMoreChars()
     {
-        var dto = new LoginRequest { Username = "abc", Password = "123456" };
+        var dto = new LoginRequest { Username = "abc", Password = "Admin@123" };
         var result = ValidateProperty(dto, nameof(LoginRequest.Username));
         result.Should().BeNull();
     }
@@ -72,7 +72,7 @@ public class AuthRequestValidationTests
     [Fact]
     public void LoginRequest_Password_ShouldPass_When6OrMoreChars()
     {
-        var dto = new LoginRequest { Username = "abc", Password = "123456" };
+        var dto = new LoginRequest { Username = "abc", Password = "Admin@123" };
         var result = ValidateProperty(dto, nameof(LoginRequest.Password));
         result.Should().BeNull();
     }
@@ -88,12 +88,14 @@ public class AuthRequestValidationTests
     [Fact]
     public void LoginRequest_ShouldPass_WhenValid()
     {
-        var dto = new LoginRequest { Username = "admin", Password = "123456" };
+        var dto = new LoginRequest { Username = "admin@email.com", Password = "Admin@123" };
         var results = ValidateObject(dto);
         results.Should().BeEmpty();
     }
 
     // ========== RegisterRequest ==========
+
+    private const string ValidPassword = "Admin@123";
 
     [Fact]
     public void RegisterRequest_Username_ShouldBeRequired()
@@ -127,7 +129,7 @@ public class AuthRequestValidationTests
         var dto = new RegisterRequest
         {
             Username = "validuser",
-            Password = "123456",
+            Password = ValidPassword,
             Nome = "Valid User"
         };
         var result = ValidateProperty(dto, nameof(RegisterRequest.Username));
@@ -143,21 +145,57 @@ public class AuthRequestValidationTests
     }
 
     [Fact]
-    public void RegisterRequest_Password_ShouldFail_WhenLessThan6Chars()
+    public void RegisterRequest_Password_ShouldFail_WhenLessThan8Chars()
     {
-        var dto = new RegisterRequest { Password = "12345" };
+        var dto = new RegisterRequest { Password = "Ab@1" };
         var result = ValidateProperty(dto, nameof(RegisterRequest.Password));
         result.Should().NotBeNull();
-        result!.ErrorMessage.Should().Contain("6");
+        result!.ErrorMessage.Should().Contain("8");
     }
 
     [Fact]
-    public void RegisterRequest_Password_ShouldPass_When6OrMoreChars()
+    public void RegisterRequest_Password_ShouldFail_WhenMissingUppercase()
+    {
+        var dto = new RegisterRequest { Password = "admin@123" };
+        var result = ValidateProperty(dto, nameof(RegisterRequest.Password));
+        result.Should().NotBeNull();
+        result!.ErrorMessage.Should().Contain("maiúscula");
+    }
+
+    [Fact]
+    public void RegisterRequest_Password_ShouldFail_WhenMissingLowercase()
+    {
+        var dto = new RegisterRequest { Password = "ADMIN@123" };
+        var result = ValidateProperty(dto, nameof(RegisterRequest.Password));
+        result.Should().NotBeNull();
+        result!.ErrorMessage.Should().Contain("minúscula");
+    }
+
+    [Fact]
+    public void RegisterRequest_Password_ShouldFail_WhenMissingNumber()
+    {
+        var dto = new RegisterRequest { Password = "Admin@abc" };
+        var result = ValidateProperty(dto, nameof(RegisterRequest.Password));
+        result.Should().NotBeNull();
+        result!.ErrorMessage.Should().Contain("número");
+    }
+
+    [Fact]
+    public void RegisterRequest_Password_ShouldFail_WhenMissingSpecialChar()
+    {
+        var dto = new RegisterRequest { Password = "Admin1234" };
+        var result = ValidateProperty(dto, nameof(RegisterRequest.Password));
+        result.Should().NotBeNull();
+        result!.ErrorMessage.Should().Contain("especial");
+    }
+
+    [Fact]
+    public void RegisterRequest_Password_ShouldPass_WhenMeetsComplexity()
     {
         var dto = new RegisterRequest
         {
             Username = "user",
-            Password = "123456",
+            Password = ValidPassword,
             Nome = "User"
         };
         var result = ValidateProperty(dto, nameof(RegisterRequest.Password));
@@ -187,7 +225,7 @@ public class AuthRequestValidationTests
         var dto = new RegisterRequest
         {
             Username = "user",
-            Password = "123456",
+            Password = ValidPassword,
             Nome = new string('A', 100)
         };
         var result = ValidateProperty(dto, nameof(RegisterRequest.Nome));
@@ -208,7 +246,7 @@ public class AuthRequestValidationTests
         var dto = new RegisterRequest
         {
             Username = "newuser",
-            Password = "123456",
+            Password = ValidPassword,
             Nome = "New User"
         };
         var results = ValidateObject(dto);

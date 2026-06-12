@@ -94,8 +94,8 @@ using (var scope = app.Services.CreateScope())
             {
                 context.Usuarios.Add(new Usuario
                 {
-                    Username = "admin",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    Username = "admin@email.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                     Nome = "Administrador"
                 });
                 await context.SaveChangesAsync();

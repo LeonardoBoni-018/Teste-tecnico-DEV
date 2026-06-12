@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using SoftLineTeste.Api.Validators;
 
 namespace SoftLineTeste.Api.DTOs;
 
@@ -10,7 +11,7 @@ public class RegisterRequest
     public string Username { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Senha é obrigatória")]
-    [MinLength(6, ErrorMessage = "Senha deve ter no mínimo 6 caracteres")]
+    [PasswordComplexity]
     public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Nome é obrigatório")]

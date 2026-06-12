@@ -44,8 +44,12 @@ export default function Login() {
       setError('Preencha todos os campos');
       return;
     }
-    if (password.length < 6) {
-      setError('Senha deve ter no mínimo 6 caracteres');
+    if (password.length < 8) {
+      setError('Senha deve ter no mínimo 8 caracteres');
+      return;
+    }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      setError('Senha deve conter letra maiúscula, minúscula, número e caractere especial');
       return;
     }
     if (password !== confirmPassword) {
@@ -121,7 +125,7 @@ export default function Login() {
             <div className="form-group">
               <label className="form-label" htmlFor="reg-password">Senha</label>
               <input id="reg-password" type="password" className="form-input" value={password}
-                onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+                onChange={(e) => setPassword(e.target.value)} placeholder="Maiúscula, minúscula, número e caractere especial" />
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="reg-confirm-password">Confirmar Senha</label>
