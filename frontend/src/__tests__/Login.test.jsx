@@ -113,11 +113,11 @@ describe('Login Page', () => {
     api.authService.login.mockResolvedValue({ data: { token: 'abc', nome: 'User', expiresAt: new Date(Date.now() + 3600000).toISOString() } });
     const user = userEvent.setup();
     renderLogin();
-    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin@email.com');
+    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin');
     await user.type(screen.getByPlaceholderText('Digite sua senha'), 'Admin@123');
     fireEvent.click(screen.getByText('Entrar'));
     await waitFor(() => {
-      expect(api.authService.login).toHaveBeenCalledWith({ username: 'admin@email.com', password: 'Admin@123' });
+      expect(api.authService.login).toHaveBeenCalledWith({ username: 'admin', password: 'Admin@123' });
     });
   });
 
@@ -125,7 +125,7 @@ describe('Login Page', () => {
     api.authService.login.mockRejectedValue({ response: { data: { message: 'Usuário ou senha inválidos' } } });
     const user = userEvent.setup();
     renderLogin();
-    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin@email.com');
+    await user.type(screen.getByPlaceholderText('Digite seu usuário'), 'admin');
     await user.type(screen.getByPlaceholderText('Digite sua senha'), 'wrong');
     fireEvent.click(screen.getByText('Entrar'));
     await waitFor(() => {

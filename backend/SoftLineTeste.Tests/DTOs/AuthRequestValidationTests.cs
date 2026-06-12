@@ -88,7 +88,7 @@ public class AuthRequestValidationTests
     [Fact]
     public void LoginRequest_ShouldPass_WhenValid()
     {
-        var dto = new LoginRequest { Username = "admin@email.com", Password = "Admin@123" };
+        var dto = new LoginRequest { Username = "admin", Password = "Admin@123" };
         var results = ValidateObject(dto);
         results.Should().BeEmpty();
     }

@@ -69,7 +69,7 @@ npm run dev
 
 ### Login padrão
 
-**admin@email.com** / **Admin@123** (criado automaticamente na primeira execução)
+**admin** / **Admin@123** (criado automaticamente na primeira execução)
 
 ## Testes
 
