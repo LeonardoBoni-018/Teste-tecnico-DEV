@@ -48,7 +48,7 @@ export default function Login() {
       setError('Senha deve ter no mínimo 8 caracteres');
       return;
     }
-    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       setError('Senha deve conter letra maiúscula, minúscula, número e caractere especial');
       return;
     }
