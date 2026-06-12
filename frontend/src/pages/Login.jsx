@@ -125,7 +125,8 @@ export default function Login() {
             <div className="form-group">
               <label className="form-label" htmlFor="reg-password">Senha</label>
               <input id="reg-password" type="password" className="form-input" value={password}
-                onChange={(e) => setPassword(e.target.value)} placeholder="Maiúscula, minúscula, número e caractere especial" />
+                onChange={(e) => setPassword(e.target.value)} placeholder="Digite sua senha" />
+              <span className="form-hint">Mín. 8 caracteres: maiúscula, minúscula, número e caractere especial</span>
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="reg-confirm-password">Confirmar Senha</label>

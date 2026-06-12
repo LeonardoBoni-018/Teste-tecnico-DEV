@@ -216,6 +216,13 @@ body {
   min-height: 80px;
 }
 
+.form-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
 .char-counter {
   font-size: 11px;
   color: var(--text-muted);

@@ -63,7 +63,7 @@ describe('Login Page', () => {
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
-    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'Ab@1');
+    await user.type(screen.getByPlaceholderText('Digite sua senha'), 'Ab@1');
     await user.type(screen.getByPlaceholderText('Repita a senha'), 'Ab@1');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
@@ -77,7 +77,7 @@ describe('Login Page', () => {
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
-    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'Admin@123');
+    await user.type(screen.getByPlaceholderText('Digite sua senha'), 'Admin@123');
     await user.type(screen.getByPlaceholderText('Repita a senha'), 'Admin@456');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
@@ -91,7 +91,7 @@ describe('Login Page', () => {
     const user = userEvent.setup();
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
-    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'abcdefgh');
+    await user.type(screen.getByPlaceholderText('Digite sua senha'), 'abcdefgh');
     await user.type(screen.getByPlaceholderText('Repita a senha'), 'abcdefgh');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
@@ -140,7 +140,7 @@ describe('Login Page', () => {
     fireEvent.click(screen.getByText('Registrar-se'));
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'New User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'newuser');
-    await user.type(screen.getByPlaceholderText('Maiúscula, minúscula, número e caractere especial'), 'Admin@123');
+    await user.type(screen.getByPlaceholderText('Digite sua senha'), 'Admin@123');
     await user.type(screen.getByPlaceholderText('Repita a senha'), 'Admin@123');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
