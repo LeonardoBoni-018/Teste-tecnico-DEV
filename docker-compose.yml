@@ -1,49 +1,62 @@
 services:
   db:
     image: mysql:8.0
-    container_name: novagest-db
+    container_name: softline_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: SoftLineTeste
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3305:3306"
+      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./database/01_CreateDatabase.sql:/docker-entrypoint-initdb.d/01_CreateDatabase.sql
+      - db_data:/var/lib/mysql
+      - ./database/01_CreateDatabase.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+    networks:
+      - softline_net
 
   backend:
-    build: ./backend/SoftLineTeste.Api
-    container_name: novagest-backend
+    build:
+      context: ./backend/SoftLineTeste.Api
+      dockerfile: Dockerfile
+    container_name: softline_backend
     restart: unless-stopped
-    ports:
-      - "5144:8080"
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      DB_CONNECTION_STRING: Server=db;Port=3306;Database=SoftLineTeste;User=root;Password=root;
-      JWT_KEY: SoftLineTesteSuperSecretKeyForJwtToken2026!@#$%
+      JWT_KEY: ${JWT_KEY}
+      DB_CONNECTION_STRING: server=db;port=3306;database=SoftLineTeste;user=${MYSQL_USER};password=${MYSQL_PASSWORD};
+    ports:
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - softline_net
 
   frontend:
     build:
       context: ./frontend
-      args:
-        VITE_API_URL: /api
-    container_name: novagest-frontend
+      dockerfile: Dockerfile
+    container_name: softline_frontend
     restart: unless-stopped
     ports:
-      - "5173:80"
+      - "80:80"
     depends_on:
       - backend
+    networks:
+      - softline_net
 
 volumes:
-  mysql_data:
+  db_data:
+
+networks:
+  softline_net:
+    driver: bridge

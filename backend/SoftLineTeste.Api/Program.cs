@@ -17,6 +17,8 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"
 if (string.IsNullOrEmpty(jwtKey))
     throw new InvalidOperationException("JWT_KEY environment variable is not set");
 
+builder.Configuration["Jwt:Key"] = jwtKey;
+
 if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("DB_CONNECTION_STRING environment variable is not set");
 
@@ -46,11 +48,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+var allowedOrigins = (Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")
+    ?? "http://localhost:5173,http://localhost:80,http://localhost")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(allowedOrigins)
               .WithHeaders("Authorization", "Content-Type")
               .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
     });
@@ -79,15 +85,28 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    if (!await context.Usuarios.AnyAsync())
+    var retries = 10;
+    while (retries-- > 0)
     {
-        context.Usuarios.Add(new Usuario
+        try
         {
-            Username = "admin",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-            Nome = "Administrador"
-        });
-        await context.SaveChangesAsync();
+            if (!await context.Usuarios.AnyAsync())
+            {
+                context.Usuarios.Add(new Usuario
+                {
+                    Username = "admin",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    Nome = "Administrador"
+                });
+                await context.SaveChangesAsync();
+            }
+            break;
+        }
+        catch
+        {
+            if (retries == 0) throw;
+            await Task.Delay(3000);
+        }
     }
 }
 
