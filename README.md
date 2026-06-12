@@ -12,13 +12,13 @@ Aplicação full stack para cadastro de produtos e clientes com autenticação J
 | Backend | C# / .NET 8 Web API (EF Core, JWT) |
 | Banco | MySQL 8.0 |
 | Autenticação | JWT Bearer + BCrypt |
-| Validações | CPF/CNPJ, complexidade de senha (maiúscula, minúscula, número, especial) |
+| Validações | CPF/CNPJ (dígitos verificadores), complexidade de senha (maiúscula, minúscula, número, especial) |
 | Testes | xUnit (backend) + Vitest (frontend) |
 | Docker | docker compose (banco + backend + frontend) |
 
 ## Funcionalidades
 
-- Login com usuário e senha + opção de registro
+- Login com usuário e senha + registro com confirmação de senha e validação de complexidade
 - Dashboard com acesso rápido e atividade recente
 - CRUD de Produtos (código, descrição, código de barras, valor venda, peso bruto/líquido)
 - CRUD de Clientes (código, nome, fantasia, documento CPF/CNPJ com máscara, endereço)
@@ -74,11 +74,11 @@ npm run dev
 ## Testes
 
 ```bash
-# Backend (89 testes xUnit)
+# Backend (93 testes xUnit)
 cd backend/SoftLineTeste.Tests
 dotnet test
 
-# Frontend (46 testes Vitest)
+# Frontend (48 testes Vitest)
 cd frontend
 npm test
 ```
@@ -95,7 +95,7 @@ npm test
 │   │   ├── DTOs/               # Requests com validação
 │   │   ├── Services/           # Token JWT, Rate limiter
 │   │   ├── Data/               # EF Core DbContext
-│   │   └── Validators/         # CPF/CNPJ validation
+│   │   └── Validators/         # CPF/CNPJ, PasswordComplexity
 │   └── SoftLineTeste.Tests/    # Testes xUnit
 ├── frontend/                   # React + Vite
 │   └── src/
