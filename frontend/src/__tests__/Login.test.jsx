@@ -64,9 +64,24 @@ describe('Login Page', () => {
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), '12345');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), '12345');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
       expect(screen.getByText('Senha deve ter no mínimo 6 caracteres')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error when passwords do not match', async () => {
+    renderLogin();
+    fireEvent.click(screen.getByText('Registrar-se'));
+    const user = userEvent.setup();
+    await user.type(screen.getByPlaceholderText('Seu nome completo'), 'Test User');
+    await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'testuser');
+    await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), '123456');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), '654321');
+    fireEvent.click(screen.getByText('Criar Acesso'));
+    await waitFor(() => {
+      expect(screen.getByText('As senhas informadas não conferem')).toBeInTheDocument();
     });
   });
 
@@ -112,6 +127,7 @@ describe('Login Page', () => {
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'New User');
     await user.type(screen.getByPlaceholderText('Escolha um usuário'), 'newuser');
     await user.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), '123456');
+    await user.type(screen.getByPlaceholderText('Repita a senha'), '123456');
     fireEvent.click(screen.getByText('Criar Acesso'));
     await waitFor(() => {
       expect(api.authService.register).toHaveBeenCalledWith({ username: 'newuser', password: '123456', nome: 'New User' });

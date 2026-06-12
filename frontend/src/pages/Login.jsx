@@ -9,6 +9,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [nome, setNome] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -39,12 +40,16 @@ export default function Login() {
     e.preventDefault();
     setError('');
 
-    if (!username.trim() || !password.trim() || !nome.trim()) {
+    if (!username.trim() || !password.trim() || !nome.trim() || !confirmPassword.trim()) {
       setError('Preencha todos os campos');
       return;
     }
     if (password.length < 6) {
       setError('Senha deve ter no mínimo 6 caracteres');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('As senhas informadas não conferem');
       return;
     }
 
@@ -63,6 +68,7 @@ export default function Login() {
   const switchMode = () => {
     setMode(mode === 'login' ? 'register' : 'login');
     setError('');
+    setConfirmPassword('');
   };
 
   return (
@@ -116,6 +122,11 @@ export default function Login() {
               <label className="form-label" htmlFor="reg-password">Senha</label>
               <input id="reg-password" type="password" className="form-input" value={password}
                 onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="reg-confirm-password">Confirmar Senha</label>
+              <input id="reg-confirm-password" type="password" className="form-input" value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repita a senha" />
             </div>
             <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
               {loading ? <span className="spinner-sm" /> : 'Criar Acesso'}

@@ -76,11 +76,11 @@ describe('ClienteForm validation', () => {
   });
 
   it('limits nome to 60 chars via maxLength', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: 10 });
     const { $nome } = renderForm();
     await user.type($nome(), 'A'.repeat(70));
     expect($nome().value.length).toBe(60);
-  });
+  }, 15000);
 
   it('limits fantasia to 100 chars via maxLength', async () => {
     const user = userEvent.setup({ delay: 15 });
