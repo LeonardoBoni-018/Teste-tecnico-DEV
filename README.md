@@ -1,6 +1,6 @@
 # NovaGest - Sistema de Gerenciamento
 
-Aplicação full stack para cadastro de produtos e clientes com autenticação JWT, construída com .NET 8, React 19 e MySQL.
+Aplicação full stack para cadastro de produtos e clientes com autenticação JWT, construída com .NET 8, React 19 e SQL Server.
 
 ## Stack
 
@@ -8,7 +8,7 @@ Aplicação full stack para cadastro de produtos e clientes com autenticação J
 |--------|-----------|
 | Frontend | React 19 + Vite + MUI (Material UI) |
 | Backend | C# / .NET 8 Web API (EF Core, JWT, BCrypt) |
-| Banco | MySQL 8.0 |
+| Banco | SQL Server 2022 |
 | Validações | CPF/CNPJ (dígitos verificadores), Complexidade de senha, Formatação de documento |
 | Testes | xUnit + FluentAssertions (backend) · Vitest + Testing Library (frontend) |
 | Infra | Docker Compose (nginx + API + banco) |
@@ -45,11 +45,11 @@ docker compose up --build
 
 ### Sem Docker
 
-**Pré-requisitos:** MySQL 8.0 rodando na porta 3306, .NET 8 SDK, Node.js 20+.
+**Pré-requisitos:** SQL Server 2022 rodando na porta 1433, .NET 8 SDK, Node.js 20+.
 
 ```bash
 # 1. Banco de dados
-# Execute o script database/01_CreateDatabase.sql no MySQL
+# Execute o script database/01_CreateDatabase.sql no SQL Server (opcional — EF Core cria as tabelas automaticamente)
 
 # 2. Backend
 cd backend/SoftLineTeste.Api
@@ -107,7 +107,7 @@ npm run test:watch  # Modo watch
 │       ├── services/                 # Axios client + service wrappers
 │       ├── styles/                   # CSS global com variáveis (claro/escuro)
 │       └── __tests__/                # Testes (Vitest + Testing Library)
-├── docker-compose.yml                # Orquestração (MySQL + API + nginx)
+├── docker-compose.yml                # Orquestração (SQL Server + API + nginx)
 ├── .env                              # Variáveis de ambiente (não versionado)
 └── .gitignore
 ```
