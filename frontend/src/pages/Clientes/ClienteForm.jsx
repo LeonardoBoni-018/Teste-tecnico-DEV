@@ -32,10 +32,40 @@ function maskDocument(value) {
     .slice(0, 18);
 }
 
+function isValidCpf(cpf) {
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += Number(cpf[i]) * (10 - i);
+  const d1 = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  if (Number(cpf[9]) !== d1) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += Number(cpf[i]) * (11 - i);
+  const d2 = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  return Number(cpf[10]) === d2;
+}
+
+function isValidCnpj(cnpj) {
+  if (/^(\d)\1{13}$/.test(cnpj)) return false;
+  const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += Number(cnpj[i]) * w1[i];
+  const d1 = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  if (Number(cnpj[12]) !== d1) return false;
+  sum = 0;
+  for (let i = 0; i < 13; i++) sum += Number(cnpj[i]) * w2[i];
+  const d2 = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  return Number(cnpj[13]) === d2;
+}
+
 function validateDocument(value) {
   const cleaned = value.replace(/\D/g, '');
-  if (cleaned.length === 11 || cleaned.length === 14) return '';
-  return 'Documento deve ser CPF (11 dígitos) ou CNPJ (14 dígitos)';
+  if (cleaned.length !== 11 && cleaned.length !== 14) {
+    return 'Documento deve ser CPF (11 dígitos) ou CNPJ (14 dígitos)';
+  }
+  if (cleaned.length === 11 && !isValidCpf(cleaned)) return 'CPF inválido';
+  if (cleaned.length === 14 && !isValidCnpj(cleaned)) return 'CNPJ inválido';
+  return '';
 }
 
 const getInitials = (name) =>
@@ -106,7 +136,7 @@ export default function ClienteForm() {
     if (!formData.codigo || Number(formData.codigo) <= 0) e.codigo = 'Código deve ser um número positivo';
     if (!formData.nome.trim()) e.nome = 'Nome é obrigatório';
     else if (formData.nome.length > 60) e.nome = 'Máximo 60 caracteres';
-    if (!formData.fantasia.trim()) e.fantasia = 'Fantasia é obrigatório';
+    if (!formData.fantasia.trim()) e.fantasia = 'Fantasia é obrigatória';
     else if (formData.fantasia.length > 100) e.fantasia = 'Máximo 100 caracteres';
     const docError = validateDocument(formData.documento);
     if (docError) e.documento = docError;
@@ -281,7 +311,8 @@ export default function ClienteForm() {
               multiline
               rows={3}
               error={Boolean(errors.endereco)}
-              helperText={errors.endereco}
+              helperText={errors.endereco || `${formData.endereco.length}/500 caracteres`}
+              inputProps={{ maxLength: 500 }}
               InputProps={{ startAdornment: <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}><LocationOnIcon /></InputAdornment> }}
               sx={fieldSx(errors.endereco)}
             />

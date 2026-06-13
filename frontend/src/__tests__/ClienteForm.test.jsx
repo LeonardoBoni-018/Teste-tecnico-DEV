@@ -59,7 +59,7 @@ describe('ClienteForm validation', () => {
     await waitFor(() => {
       expect(screen.getByText('Código deve ser um número positivo')).toBeInTheDocument();
       expect(screen.getByText('Nome é obrigatório')).toBeInTheDocument();
-      expect(screen.getByText('Fantasia é obrigatório')).toBeInTheDocument();
+      expect(screen.getByText('Fantasia é obrigatória')).toBeInTheDocument();
       expect(screen.getByText('Documento deve ser CPF (11 dígitos) ou CNPJ (14 dígitos)')).toBeInTheDocument();
       expect(screen.getByText('Endereço é obrigatório')).toBeInTheDocument();
     });

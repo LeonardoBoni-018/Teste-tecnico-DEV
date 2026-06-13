@@ -8,8 +8,9 @@ public class CpfCnpjAttribute : ValidationAttribute
     {
         var doc = value?.ToString()?.Replace(".", "").Replace("-", "").Replace("/", "");
 
+        // Presença é responsabilidade do [Required]; aqui validamos apenas o formato/dígitos.
         if (string.IsNullOrEmpty(doc))
-            return new ValidationResult("Documento é obrigatório");
+            return ValidationResult.Success;
 
         if (doc.Length == 11)
             return IsValidCpf(doc) ? ValidationResult.Success

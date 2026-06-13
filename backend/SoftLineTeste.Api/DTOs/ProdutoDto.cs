@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SoftLineTeste.Api.DTOs;
 
-public class ProdutoRequest
+public class ProdutoRequest : IValidatableObject
 {
     [Required(ErrorMessage = "Código é obrigatório")]
     [Range(1, int.MaxValue, ErrorMessage = "Código deve ser um número positivo")]
@@ -14,6 +14,7 @@ public class ProdutoRequest
 
     [Required(ErrorMessage = "Código de Barras é obrigatório")]
     [MaxLength(14, ErrorMessage = "Código de Barras deve ter no máximo 14 caracteres")]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Código de Barras deve conter apenas números")]
     public string CodigoBarras { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Valor de Venda é obrigatório")]
@@ -27,6 +28,16 @@ public class ProdutoRequest
     [Required(ErrorMessage = "Peso Líquido é obrigatório")]
     [Range(0.001, double.MaxValue, ErrorMessage = "Peso Líquido deve ser maior que zero")]
     public decimal PesoLiquido { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (PesoBruto > 0 && PesoLiquido > 0 && PesoLiquido > PesoBruto)
+        {
+            yield return new ValidationResult(
+                "Peso Líquido não pode ser maior que o Peso Bruto",
+                new[] { nameof(PesoLiquido) });
+        }
+    }
 }
 
 public class ProdutoResponse

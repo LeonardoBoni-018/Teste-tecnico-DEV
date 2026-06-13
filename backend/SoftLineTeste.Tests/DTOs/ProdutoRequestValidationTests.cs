@@ -17,6 +17,24 @@ public class ProdutoRequestValidationTests
         return results.FirstOrDefault();
     }
 
+    private static List<ValidationResult> ValidateObject(object model)
+    {
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(model);
+        Validator.TryValidateObject(model, context, results, validateAllProperties: true);
+        return results;
+    }
+
+    private static ProdutoRequest ValidProduto() => new()
+    {
+        Codigo = 1,
+        Descricao = "Produto Teste",
+        CodigoBarras = "7891234567890",
+        ValorVenda = 29.99m,
+        PesoBruto = 1.500m,
+        PesoLiquido = 1.200m
+    };
+
     [Fact]
     public void Codigo_DefaultIsZero_ShouldFail()
     {
@@ -160,6 +178,47 @@ public class ProdutoRequestValidationTests
     {
         var dto = new ProdutoRequest { PesoLiquido = 0.300m };
         var result = Validate(dto, nameof(ProdutoRequest.PesoLiquido));
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void PesoLiquido_ShouldFail_WhenGreaterThanPesoBruto()
+    {
+        var dto = ValidProduto();
+        dto.PesoBruto = 1.000m;
+        dto.PesoLiquido = 2.000m;
+
+        var results = ValidateObject(dto);
+
+        results.Should().ContainSingle(r => r.ErrorMessage == "Peso Líquido não pode ser maior que o Peso Bruto");
+    }
+
+    [Fact]
+    public void PesoLiquido_ShouldPass_WhenEqualToPesoBruto()
+    {
+        var dto = ValidProduto();
+        dto.PesoBruto = 1.500m;
+        dto.PesoLiquido = 1.500m;
+
+        var results = ValidateObject(dto);
+
+        results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CodigoBarras_ShouldFail_WhenNotNumeric()
+    {
+        var dto = new ProdutoRequest { CodigoBarras = "ABC123" };
+        var result = Validate(dto, nameof(ProdutoRequest.CodigoBarras));
+        result.Should().NotBeNull();
+        result!.ErrorMessage.Should().Be("Código de Barras deve conter apenas números");
+    }
+
+    [Fact]
+    public void CodigoBarras_ShouldPass_WhenNumeric()
+    {
+        var dto = ValidProduto();
+        var result = Validate(dto, nameof(ProdutoRequest.CodigoBarras));
         result.Should().BeNull();
     }
 }

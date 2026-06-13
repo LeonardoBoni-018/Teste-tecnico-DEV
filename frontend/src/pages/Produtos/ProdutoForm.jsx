@@ -27,7 +27,7 @@ const fieldSx = (hasError) => ({
   },
   '& .MuiInputLabel-root': { color: 'var(--text-secondary)', fontSize: 13 },
   '& .MuiInputLabel-root.Mui-focused': { color: 'var(--primary)' },
-  '& .MuiFormHelperText-root': { color: 'var(--error)', fontSize: 11.5, mx: 0 },
+  '& .MuiFormHelperText-root': { color: hasError ? 'var(--error)' : 'var(--text-muted)', fontSize: 11.5, mx: 0 },
   '& .MuiInputAdornment-root svg': { color: 'var(--text-muted)', fontSize: 18 },
 });
 
@@ -67,16 +67,25 @@ export default function ProdutoForm() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
+  const decimalPlaces = (value) => String(value).split('.')[1]?.length || 0;
+
   const validate = () => {
     const e = {};
     if (!formData.codigo || Number(formData.codigo) <= 0) e.codigo = 'Código deve ser um número positivo';
     if (!formData.descricao.trim()) e.descricao = 'Descrição é obrigatória';
     else if (formData.descricao.length > 60) e.descricao = 'Máximo 60 caracteres';
-    if (!formData.codigoBarras.trim()) e.codigoBarras = 'Código de barras é obrigatório';
+    if (!formData.codigoBarras.trim()) e.codigoBarras = 'Código de Barras é obrigatório';
     else if (formData.codigoBarras.length > 14) e.codigoBarras = 'Máximo 14 caracteres';
+    else if (!/^\d+$/.test(formData.codigoBarras)) e.codigoBarras = 'Código de Barras deve conter apenas números';
     if (!formData.valorVenda || Number(formData.valorVenda) <= 0) e.valorVenda = 'Valor deve ser maior que zero';
+    else if (decimalPlaces(formData.valorVenda) > 2) e.valorVenda = 'Valor deve ter no máximo 2 casas decimais';
     if (!formData.pesoBruto || Number(formData.pesoBruto) <= 0) e.pesoBruto = 'Peso deve ser maior que zero';
+    else if (decimalPlaces(formData.pesoBruto) > 3) e.pesoBruto = 'Peso deve ter no máximo 3 casas decimais';
     if (!formData.pesoLiquido || Number(formData.pesoLiquido) <= 0) e.pesoLiquido = 'Peso deve ser maior que zero';
+    else if (decimalPlaces(formData.pesoLiquido) > 3) e.pesoLiquido = 'Peso deve ter no máximo 3 casas decimais';
+    else if (Number(formData.pesoBruto) > 0 && Number(formData.pesoLiquido) > Number(formData.pesoBruto)) {
+      e.pesoLiquido = 'Peso Líquido não pode ser maior que o Peso Bruto';
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -190,7 +199,7 @@ export default function ProdutoForm() {
                 label="Código de Barras"
                 name="codigoBarras"
                 value={formData.codigoBarras}
-                onChange={(e) => { if (e.target.value.length <= 14) handleChange(e); }}
+                onChange={(e) => { if (/^\d*$/.test(e.target.value) && e.target.value.length <= 14) handleChange(e); }}
                 disabled={isView}
                 error={Boolean(errors.codigoBarras)}
                 helperText={errors.codigoBarras || `${formData.codigoBarras.length}/14 caracteres`}
@@ -220,7 +229,7 @@ export default function ProdutoForm() {
 
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2.5 }}>
               <TextField
-                label="Valor de Venda"
+                label="Valor de Venda (R$)"
                 name="valorVenda"
                 type="number"
                 value={formData.valorVenda}
