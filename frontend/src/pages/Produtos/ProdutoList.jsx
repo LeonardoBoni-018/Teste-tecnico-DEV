@@ -14,9 +14,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SearchIcon from '@mui/icons-material/Search';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import ScaleIcon from '@mui/icons-material/Scale';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 const formatCurrency = (v) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+
+const headCells = [
+  { id: 'codigo', label: 'Código', width: 100, align: 'center' },
+  { id: 'descricao', label: 'Descrição', width: 'auto' },
+  { id: 'codigoBarras', label: 'Código de Barras', width: 160, align: 'center' },
+  { id: 'valorVenda', label: 'Valor de Venda', width: 150, align: 'right' },
+  { id: 'pesoBruto', label: 'Peso Bruto', width: 130, align: 'right' },
+  { id: 'pesoLiquido', label: 'Peso Líquido', width: 130, align: 'right' },
+];
 
 export default function ProdutoList() {
   const [produtos, setProdutos] = useState([]);
@@ -85,32 +96,23 @@ export default function ProdutoList() {
       return 0;
     });
 
-  const headCells = [
-    { id: 'codigo', label: 'Código', width: 90 },
-    { id: 'descricao', label: 'Descrição' },
-    { id: 'codigoBarras', label: 'Cód. Barras', width: 150 },
-    { id: 'valorVenda', label: 'Valor Venda', width: 130, align: 'right' },
-    { id: 'pesoBruto', label: 'P. Bruto', width: 110, align: 'right' },
-    { id: 'pesoLiquido', label: 'P. Líquido', width: 110, align: 'right' },
-  ];
-
   const tableSx = {
     bgcolor: 'transparent',
     '& .MuiTableCell-head': {
       bgcolor: 'var(--surface-hover)',
       color: 'var(--text-secondary)',
-      fontSize: 11,
+      fontSize: 11.5,
       fontWeight: 700,
       textTransform: 'uppercase',
-      letterSpacing: '0.5px',
-      borderBottom: '1px solid var(--border)',
-      py: 1.5,
+      letterSpacing: '0.6px',
+      borderBottom: '2px solid var(--border)',
+      py: 1.6,
     },
     '& .MuiTableCell-body': {
       color: 'var(--text-primary)',
       fontSize: 13.5,
       borderBottom: '1px solid var(--border)',
-      py: 1.25,
+      py: 1.4,
     },
     '& .MuiTableRow-root:last-child .MuiTableCell-body': { borderBottom: 'none' },
     '& .MuiTableRow-root:hover .MuiTableCell-body': { bgcolor: 'var(--surface-hover)' },
@@ -131,7 +133,6 @@ export default function ProdutoList() {
         />
       )}
 
-      {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 24 }}>
@@ -160,11 +161,10 @@ export default function ProdutoList() {
         bgcolor: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)',
       }}>
-        {/* Search bar */}
         <Box sx={{ p: 2, borderBottom: '1px solid var(--border)' }}>
           <TextField
             size="small"
-            placeholder="Buscar por código, descrição ou cód. barras..."
+            placeholder="Buscar por código, descrição ou código de barras..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -175,7 +175,7 @@ export default function ProdutoList() {
               ),
             }}
             sx={{
-              width: 340,
+              width: 380,
               '& .MuiOutlinedInput-root': {
                 bgcolor: 'var(--surface-hover)',
                 borderRadius: '8px',
@@ -198,7 +198,7 @@ export default function ProdutoList() {
         {loading ? (
           <Box sx={{ p: 2 }}>
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} height={48} sx={{ bgcolor: 'var(--surface-hover)', mb: 0.5, borderRadius: 1 }} />
+              <Skeleton key={i} height={52} sx={{ bgcolor: 'var(--surface-hover)', mb: 0.5, borderRadius: 1 }} />
             ))}
           </Box>
         ) : filtered.length === 0 ? (
@@ -237,63 +237,75 @@ export default function ProdutoList() {
                       </TableSortLabel>
                     </TableCell>
                   ))}
-                  <TableCell align="right">Ações</TableCell>
+                  <TableCell align="center" sx={{ width: 130 }}>Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filtered.map((p) => (
                   <TableRow key={p.id}>
-                    <TableCell>
+                    <TableCell align="center">
                       <Chip
                         label={`#${p.codigo}`}
                         size="small"
                         sx={{
                           bgcolor: 'var(--primary-light)', color: 'var(--primary)',
-                          fontWeight: 700, fontSize: 11, height: 22, borderRadius: '6px',
+                          fontWeight: 700, fontSize: 11.5, height: 24, borderRadius: '6px',
+                          minWidth: 52,
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 500 }}>{p.descricao}</TableCell>
                     <TableCell>
-                      <Typography sx={{ fontFamily: 'monospace', fontSize: 12.5, color: 'var(--text-secondary)' }}>
+                      <Typography sx={{ fontWeight: 500, fontSize: 13.5 }}>{p.descricao}</Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography sx={{ fontFamily: 'Consolas, monospace', fontSize: 12.5, color: 'var(--text-secondary)', letterSpacing: '0.3px' }}>
                         {p.codigoBarras}
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
-                      <Typography sx={{ fontWeight: 600, color: 'var(--success)', fontSize: 13.5 }}>
-                        {formatCurrency(p.valorVenda)}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                        <AttachMoneyIcon sx={{ fontSize: 14, color: 'var(--success)', opacity: 0.7 }} />
+                        <Typography sx={{ fontWeight: 600, color: 'var(--success)', fontSize: 13.5 }}>
+                          {formatCurrency(p.valorVenda)}
+                        </Typography>
+                      </Box>
                     </TableCell>
                     <TableCell align="right">
-                      <Typography sx={{ fontFamily: 'monospace', fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                        {p.pesoBruto.toFixed(3)} kg
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                        <ScaleIcon sx={{ fontSize: 13, color: 'var(--text-muted)', opacity: 0.5 }} />
+                        <Typography sx={{ fontFamily: 'Consolas, monospace', fontSize: 12.5, color: 'var(--text-secondary)' }}>
+                          {p.pesoBruto.toFixed(3)}
+                        </Typography>
+                      </Box>
                     </TableCell>
                     <TableCell align="right">
-                      <Typography sx={{ fontFamily: 'monospace', fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                        {p.pesoLiquido.toFixed(3)} kg
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                        <ScaleIcon sx={{ fontSize: 13, color: 'var(--text-muted)', opacity: 0.5 }} />
+                        <Typography sx={{ fontFamily: 'Consolas, monospace', fontSize: 12.5, color: 'var(--text-secondary)' }}>
+                          {p.pesoLiquido.toFixed(3)}
+                        </Typography>
+                      </Box>
                     </TableCell>
-                    <TableCell align="right">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                         <Tooltip title="Visualizar">
                           <IconButton size="small" onClick={() => navigate(`/produtos/${p.id}`)}
                             sx={{ color: 'var(--secondary)', bgcolor: 'var(--secondary-light)', borderRadius: '8px', p: '6px',
-                              '&:hover': { opacity: 0.8 } }}>
+                              '&:hover': { bgcolor: 'var(--secondary)', color: '#fff' } }}>
                             <VisibilityIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                           <IconButton size="small" onClick={() => navigate(`/produtos/${p.id}/editar`)}
                             sx={{ color: 'var(--primary)', bgcolor: 'var(--primary-light)', borderRadius: '8px', p: '6px',
-                              '&:hover': { opacity: 0.8 } }}>
+                              '&:hover': { bgcolor: 'var(--primary)', color: '#fff' } }}>
                             <EditIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Excluir">
                           <IconButton size="small" onClick={() => setDeleteTarget(p)}
                             sx={{ color: 'var(--error)', bgcolor: 'var(--error-light)', borderRadius: '8px', p: '6px',
-                              '&:hover': { opacity: 0.8 } }}>
+                              '&:hover': { bgcolor: 'var(--error)', color: '#fff' } }}>
                             <DeleteIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>

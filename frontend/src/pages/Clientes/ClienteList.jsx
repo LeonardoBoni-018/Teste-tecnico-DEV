@@ -14,6 +14,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SearchIcon from '@mui/icons-material/Search';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
 
 const formatDoc = (doc) => {
   if (!doc) return '—';
@@ -32,6 +34,13 @@ const avatarColor = (name) => {
   for (let i = 0; i < (name || '').length; i++) h = (name.charCodeAt(i) + h * 31) % colors.length;
   return colors[h];
 };
+
+const headCells = [
+  { id: 'codigo', label: 'Código', width: 100, align: 'center' },
+  { id: 'nome', label: 'Cliente', width: 'auto' },
+  { id: 'documento', label: 'Documento', width: 180, align: 'center' },
+  { id: 'endereco', label: 'Endereço', width: 'auto' },
+];
 
 export default function ClienteList() {
   const [clientes, setClientes] = useState([]);
@@ -101,30 +110,23 @@ export default function ClienteList() {
       return 0;
     });
 
-  const headCells = [
-    { id: 'codigo', label: 'Código', width: 90 },
-    { id: 'nome', label: 'Nome / Fantasia' },
-    { id: 'documento', label: 'Documento', width: 170 },
-    { id: 'endereco', label: 'Endereço' },
-  ];
-
   const tableSx = {
     bgcolor: 'transparent',
     '& .MuiTableCell-head': {
       bgcolor: 'var(--surface-hover)',
       color: 'var(--text-secondary)',
-      fontSize: 11,
+      fontSize: 11.5,
       fontWeight: 700,
       textTransform: 'uppercase',
-      letterSpacing: '0.5px',
-      borderBottom: '1px solid var(--border)',
-      py: 1.5,
+      letterSpacing: '0.6px',
+      borderBottom: '2px solid var(--border)',
+      py: 1.6,
     },
     '& .MuiTableCell-body': {
       color: 'var(--text-primary)',
       fontSize: 13.5,
       borderBottom: '1px solid var(--border)',
-      py: 1.25,
+      py: 1.4,
     },
     '& .MuiTableRow-root:last-child .MuiTableCell-body': { borderBottom: 'none' },
     '& .MuiTableRow-root:hover .MuiTableCell-body': { bgcolor: 'var(--surface-hover)' },
@@ -145,7 +147,6 @@ export default function ClienteList() {
         />
       )}
 
-      {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 24 }}>
@@ -174,7 +175,6 @@ export default function ClienteList() {
         bgcolor: 'var(--surface)', border: '1px solid var(--border)',
         borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)',
       }}>
-        {/* Search bar */}
         <Box sx={{ p: 2, borderBottom: '1px solid var(--border)' }}>
           <TextField
             size="small"
@@ -189,7 +189,7 @@ export default function ClienteList() {
               ),
             }}
             sx={{
-              width: 380,
+              width: 420,
               '& .MuiOutlinedInput-root': {
                 bgcolor: 'var(--surface-hover)',
                 borderRadius: '8px',
@@ -241,7 +241,7 @@ export default function ClienteList() {
               <TableHead>
                 <TableRow>
                   {headCells.map((h) => (
-                    <TableCell key={h.id} sx={{ width: h.width }}>
+                    <TableCell key={h.id} align={h.align || 'left'} sx={{ width: h.width }}>
                       <TableSortLabel
                         active={orderBy === h.id}
                         direction={orderBy === h.id ? order : 'asc'}
@@ -251,69 +251,80 @@ export default function ClienteList() {
                       </TableSortLabel>
                     </TableCell>
                   ))}
-                  <TableCell align="right">Ações</TableCell>
+                  <TableCell align="center" sx={{ width: 130 }}>Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filtered.map((c) => (
                   <TableRow key={c.id}>
-                    <TableCell>
+                    <TableCell align="center">
                       <Chip
                         label={`#${c.codigo}`}
                         size="small"
                         sx={{
                           bgcolor: 'var(--secondary-light)', color: 'var(--secondary)',
-                          fontWeight: 700, fontSize: 11, height: 22, borderRadius: '6px',
+                          fontWeight: 700, fontSize: 11.5, height: 24, borderRadius: '6px',
+                          minWidth: 52,
                         }}
                       />
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <Avatar sx={{
-                          width: 32, height: 32, fontSize: 12, fontWeight: 700,
+                          width: 34, height: 34, fontSize: 13, fontWeight: 700,
                           bgcolor: avatarColor(c.nome), flexShrink: 0,
                         }}>
                           {getInitials(c.nome)}
                         </Avatar>
                         <Box>
-                          <Typography sx={{ fontWeight: 600, fontSize: 13.5, lineHeight: 1.2 }}>{c.nome}</Typography>
+                          <Typography sx={{ fontWeight: 600, fontSize: 13.5, lineHeight: 1.3 }}>{c.nome}</Typography>
                           {c.fantasia && (
-                            <Typography sx={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.2 }}>{c.fantasia}</Typography>
+                            <Typography sx={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.3 }}>
+                              {c.fantasia}
+                            </Typography>
                           )}
                         </Box>
                       </Box>
                     </TableCell>
-                    <TableCell>
-                      <Typography sx={{ fontFamily: 'monospace', fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                        {formatDoc(c.documento)}
-                      </Typography>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                        <FingerprintIcon sx={{ fontSize: 13, color: 'var(--text-muted)', opacity: 0.5 }} />
+                        <Typography sx={{ fontFamily: 'Consolas, monospace', fontSize: 12.5, color: 'var(--text-secondary)', letterSpacing: '0.3px' }}>
+                          {formatDoc(c.documento)}
+                        </Typography>
+                      </Box>
                     </TableCell>
                     <TableCell>
-                      <Typography sx={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 260,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {c.endereco}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <LocationOnIcon sx={{ fontSize: 15, color: 'var(--text-muted)', opacity: 0.5, flexShrink: 0 }} />
+                        <Typography sx={{
+                          fontSize: 13, color: 'var(--text-secondary)', maxWidth: 300,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {c.endereco || '—'}
+                        </Typography>
+                      </Box>
                     </TableCell>
-                    <TableCell align="right">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                         <Tooltip title="Visualizar">
                           <IconButton size="small" onClick={() => navigate(`/clientes/${c.id}`)}
                             sx={{ color: 'var(--secondary)', bgcolor: 'var(--secondary-light)', borderRadius: '8px', p: '6px',
-                              '&:hover': { opacity: 0.8 } }}>
+                              '&:hover': { bgcolor: 'var(--secondary)', color: '#fff' } }}>
                             <VisibilityIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Editar">
                           <IconButton size="small" onClick={() => navigate(`/clientes/${c.id}/editar`)}
                             sx={{ color: 'var(--primary)', bgcolor: 'var(--primary-light)', borderRadius: '8px', p: '6px',
-                              '&:hover': { opacity: 0.8 } }}>
+                              '&:hover': { bgcolor: 'var(--primary)', color: '#fff' } }}>
                             <EditIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Excluir">
                           <IconButton size="small" onClick={() => setDeleteTarget(c)}
                             sx={{ color: 'var(--error)', bgcolor: 'var(--error-light)', borderRadius: '8px', p: '6px',
-                              '&:hover': { opacity: 0.8 } }}>
+                              '&:hover': { bgcolor: 'var(--error)', color: '#fff' } }}>
                             <DeleteIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
