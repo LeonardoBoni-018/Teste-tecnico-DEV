@@ -31,6 +31,23 @@ const fieldSx = (hasError) => ({
   '& .MuiInputAdornment-root svg': { color: 'var(--text-muted)', fontSize: 18 },
 });
 
+function FieldDisplay({ label, icon, children }) {
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+        {icon && <Box sx={{ color: 'var(--text-muted)', fontSize: 16, display: 'flex' }}>{icon}</Box>}
+        <Typography sx={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+          {label}
+        </Typography>
+      </Box>
+      {typeof children === 'string' || typeof children === 'number' ? (
+        <Typography sx={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>
+          {children}
+        </Typography>
+      ) : children}
+    </Box>
+  );
+}
 export default function ProdutoForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -169,6 +186,57 @@ export default function ProdutoForm() {
         <Card sx={{ bgcolor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', p: 3 }}>
           {[...Array(5)].map((_, i) => <Skeleton key={i} height={56} sx={{ bgcolor: 'var(--surface-hover)', mb: 1.5, borderRadius: 1 }} />)}
         </Card>
+      ) : isView ? (
+        <Card sx={{
+          bgcolor: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)',
+        }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid var(--border)' }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Identificação
+            </Typography>
+          </Box>
+          <Box sx={{ p: 3 }}>
+            <FieldDisplay label="Código" icon={<TagIcon />}>{formData.codigo}</FieldDisplay>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, mb: 3 }}>
+              <FieldDisplay label="Código de Barras" icon={<QrCodeIcon />}>{formData.codigoBarras}</FieldDisplay>
+              <FieldDisplay label="Descrição">{formData.descricao}</FieldDisplay>
+            </Box>
+            <Divider sx={{ borderColor: 'var(--border)', mb: 3 }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', mb: 2.5 }}>
+              Valores e Pesos
+            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 3, mb: 3 }}>
+              <FieldDisplay label="Valor de Venda" icon={<AttachMoneyIcon />}>
+                <Typography sx={{ fontWeight: 600, color: 'var(--success)', fontSize: 15 }}>
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(formData.valorVenda)}
+                </Typography>
+              </FieldDisplay>
+              <FieldDisplay label="Peso Bruto (kg)" icon={<ScaleIcon />}>
+                <Typography sx={{ fontFamily: 'Consolas, monospace', fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>
+                  {Number(formData.pesoBruto).toFixed(3)}
+                </Typography>
+              </FieldDisplay>
+              <FieldDisplay label="Peso Líquido (kg)" icon={<ScaleIcon />}>
+                <Typography sx={{ fontFamily: 'Consolas, monospace', fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>
+                  {Number(formData.pesoLiquido).toFixed(3)}
+                </Typography>
+              </FieldDisplay>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1.5, pt: 2.5, borderTop: '1px solid var(--border)' }}>
+              <Button
+                onClick={() => navigate('/produtos')}
+                sx={{
+                  color: 'var(--text-secondary)', borderRadius: '10px', textTransform: 'none',
+                  fontWeight: 600, border: '1px solid var(--border)', px: 2.5,
+                  '&:hover': { bgcolor: 'var(--surface-hover)' },
+                }}
+              >
+                Voltar
+              </Button>
+            </Box>
+          </Box>
+        </Card>
       ) : (
         <Card sx={{
           bgcolor: 'var(--surface)', border: '1px solid var(--border)',
@@ -188,7 +256,6 @@ export default function ProdutoForm() {
                 type="number"
                 value={formData.codigo}
                 onChange={handleChange}
-                disabled={isView}
                 error={Boolean(errors.codigo)}
                 helperText={errors.codigo}
                 inputProps={{ min: 1 }}
@@ -200,7 +267,6 @@ export default function ProdutoForm() {
                 name="codigoBarras"
                 value={formData.codigoBarras}
                 onChange={(e) => { if (/^\d*$/.test(e.target.value) && e.target.value.length <= 14) handleChange(e); }}
-                disabled={isView}
                 error={Boolean(errors.codigoBarras)}
                 helperText={errors.codigoBarras || `${formData.codigoBarras.length}/14 caracteres`}
                 inputProps={{ maxLength: 14 }}
@@ -215,7 +281,6 @@ export default function ProdutoForm() {
               name="descricao"
               value={formData.descricao}
               onChange={(e) => { if (e.target.value.length <= 60) handleChange(e); }}
-              disabled={isView}
               error={Boolean(errors.descricao)}
               helperText={errors.descricao || `${formData.descricao.length}/60 caracteres`}
               inputProps={{ maxLength: 60 }}
@@ -234,7 +299,6 @@ export default function ProdutoForm() {
                 type="number"
                 value={formData.valorVenda}
                 onChange={handleChange}
-                disabled={isView}
                 error={Boolean(errors.valorVenda)}
                 helperText={errors.valorVenda}
                 inputProps={{ step: 0.01, min: 0.01 }}
@@ -247,7 +311,6 @@ export default function ProdutoForm() {
                 type="number"
                 value={formData.pesoBruto}
                 onChange={handleChange}
-                disabled={isView}
                 error={Boolean(errors.pesoBruto)}
                 helperText={errors.pesoBruto}
                 inputProps={{ step: 0.001, min: 0.001 }}
@@ -260,7 +323,6 @@ export default function ProdutoForm() {
                 type="number"
                 value={formData.pesoLiquido}
                 onChange={handleChange}
-                disabled={isView}
                 error={Boolean(errors.pesoLiquido)}
                 helperText={errors.pesoLiquido}
                 inputProps={{ step: 0.001, min: 0.001 }}

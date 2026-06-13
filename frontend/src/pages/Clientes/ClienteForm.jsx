@@ -95,6 +95,23 @@ const fieldSx = (hasError) => ({
   '& .MuiInputAdornment-root svg': { color: 'var(--text-muted)', fontSize: 18 },
 });
 
+function FieldDisplay({ label, icon, children }) {
+  return (
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+        {icon && <Box sx={{ color: 'var(--text-muted)', fontSize: 16, display: 'flex' }}>{icon}</Box>}
+        <Typography sx={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+          {label}
+        </Typography>
+      </Box>
+      {typeof children === 'string' || typeof children === 'number' ? (
+        <Typography sx={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>
+          {children}
+        </Typography>
+      ) : children}
+    </Box>
+  );
+}
 export default function ClienteForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -226,6 +243,48 @@ export default function ClienteForm() {
         <Card sx={{ bgcolor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', p: 3 }}>
           {[...Array(5)].map((_, i) => <Skeleton key={i} height={56} sx={{ bgcolor: 'var(--surface-hover)', mb: 1.5, borderRadius: 1 }} />)}
         </Card>
+      ) : isView ? (
+        <Card sx={{
+          bgcolor: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)', boxShadow: 'var(--shadow-sm)',
+        }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: '1px solid var(--border)' }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Identificação
+            </Typography>
+          </Box>
+          <Box sx={{ p: 3 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, mb: 3 }}>
+              <FieldDisplay label="Código" icon={<TagIcon />}>{formData.codigo}</FieldDisplay>
+              <FieldDisplay label="Documento" icon={<FingerprintIcon />}>{formData.documento}</FieldDisplay>
+            </Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, mb: 3 }}>
+              <FieldDisplay label="Nome" icon={<BadgeIcon />}>{formData.nome}</FieldDisplay>
+              <FieldDisplay label="Nome Fantasia" icon={<StoreIcon />}>{formData.fantasia || '—'}</FieldDisplay>
+            </Box>
+            <Divider sx={{ borderColor: 'var(--border)', mb: 3 }} />
+            <Typography sx={{ fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', mb: 2.5 }}>
+              Localização
+            </Typography>
+            <FieldDisplay label="Endereço" icon={<LocationOnIcon />}>
+              <Typography sx={{ fontSize: 14, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                {formData.endereco || '—'}
+              </Typography>
+            </FieldDisplay>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1.5, mt: 3.5, pt: 2.5, borderTop: '1px solid var(--border)' }}>
+              <Button
+                onClick={() => navigate('/clientes')}
+                sx={{
+                  color: 'var(--text-secondary)', borderRadius: '10px', textTransform: 'none',
+                  fontWeight: 600, border: '1px solid var(--border)', px: 2.5,
+                  '&:hover': { bgcolor: 'var(--surface-hover)' },
+                }}
+              >
+                Voltar
+              </Button>
+            </Box>
+          </Box>
+        </Card>
       ) : (
         <Card sx={{
           bgcolor: 'var(--surface)', border: '1px solid var(--border)',
@@ -247,7 +306,6 @@ export default function ClienteForm() {
                 type="number"
                 value={formData.codigo}
                 onChange={handleChange}
-                disabled={isView}
                 error={Boolean(errors.codigo)}
                 helperText={errors.codigo}
                 inputProps={{ min: 1 }}
@@ -259,7 +317,6 @@ export default function ClienteForm() {
                 name="documento"
                 value={formData.documento}
                 onChange={handleChange}
-                disabled={isView}
                 error={Boolean(errors.documento)}
                 helperText={errors.documento || 'CPF: 000.000.000-00 · CNPJ: 00.000.000/0000-00'}
                 inputProps={{ maxLength: 18 }}
@@ -275,7 +332,6 @@ export default function ClienteForm() {
                 name="nome"
                 value={formData.nome}
                 onChange={(e) => { if (e.target.value.length <= 60) handleChange(e); }}
-                disabled={isView}
                 error={Boolean(errors.nome)}
                 helperText={errors.nome || `${formData.nome.length}/60 caracteres`}
                 inputProps={{ maxLength: 60 }}
@@ -287,7 +343,6 @@ export default function ClienteForm() {
                 name="fantasia"
                 value={formData.fantasia}
                 onChange={(e) => { if (e.target.value.length <= 100) handleChange(e); }}
-                disabled={isView}
                 error={Boolean(errors.fantasia)}
                 helperText={errors.fantasia || `${formData.fantasia.length}/100 caracteres`}
                 inputProps={{ maxLength: 100 }}
@@ -307,7 +362,6 @@ export default function ClienteForm() {
               name="endereco"
               value={formData.endereco}
               onChange={handleChange}
-              disabled={isView}
               multiline
               rows={3}
               error={Boolean(errors.endereco)}
