@@ -1,36 +1,54 @@
-CREATE DATABASE IF NOT EXISTS SoftLineTeste
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'SoftLineTeste')
+BEGIN
+    CREATE DATABASE SoftLineTeste;
+END
+GO
 
 USE SoftLineTeste;
+GO
 
-CREATE TABLE IF NOT EXISTS Usuarios (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Username VARCHAR(50) NOT NULL UNIQUE,
-    PasswordHash VARCHAR(500) NOT NULL,
-    Nome VARCHAR(100) NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Usuarios]') AND type = 'U')
+BEGIN
+    CREATE TABLE Usuarios (
+        Id INT IDENTITY(1,1) PRIMARY KEY,
+        Username NVARCHAR(50) NOT NULL,
+        PasswordHash NVARCHAR(500) NOT NULL,
+        Nome NVARCHAR(100) NOT NULL,
+        CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+        CONSTRAINT UQ_Usuarios_Username UNIQUE (Username)
+    );
+END
+GO
 
-CREATE TABLE IF NOT EXISTS Produtos (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Codigo INT NOT NULL UNIQUE,
-    Descricao VARCHAR(60) NOT NULL,
-    CodigoBarras VARCHAR(14) NOT NULL,
-    ValorVenda DECIMAL(18,2) NOT NULL,
-    PesoBruto DECIMAL(18,3) NOT NULL,
-    PesoLiquido DECIMAL(18,3) NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Produtos]') AND type = 'U')
+BEGIN
+    CREATE TABLE Produtos (
+        Id INT IDENTITY(1,1) PRIMARY KEY,
+        Codigo INT NOT NULL,
+        Descricao NVARCHAR(60) NOT NULL,
+        CodigoBarras NVARCHAR(14) NOT NULL,
+        ValorVenda DECIMAL(18,2) NOT NULL,
+        PesoBruto DECIMAL(18,3) NOT NULL,
+        PesoLiquido DECIMAL(18,3) NOT NULL,
+        CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+        UpdatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+        CONSTRAINT UQ_Produtos_Codigo UNIQUE (Codigo)
+    );
+END
+GO
 
-CREATE TABLE IF NOT EXISTS Clientes (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Codigo INT NOT NULL UNIQUE,
-    Nome VARCHAR(60) NOT NULL,
-    Fantasia VARCHAR(100) NOT NULL,
-    Documento VARCHAR(20) NOT NULL,
-    Endereco TEXT NOT NULL,
-    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Clientes]') AND type = 'U')
+BEGIN
+    CREATE TABLE Clientes (
+        Id INT IDENTITY(1,1) PRIMARY KEY,
+        Codigo INT NOT NULL,
+        Nome NVARCHAR(60) NOT NULL,
+        Fantasia NVARCHAR(100) NOT NULL,
+        Documento NVARCHAR(20) NOT NULL,
+        Endereco NVARCHAR(MAX) NOT NULL,
+        CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+        UpdatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+        CONSTRAINT UQ_Clientes_Codigo UNIQUE (Codigo)
+    );
+END
+GO

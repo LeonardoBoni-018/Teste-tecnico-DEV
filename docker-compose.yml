@@ -1,24 +1,23 @@
 services:
   db:
-    image: mysql:8.0
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: softline_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: SoftLineTeste
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
+      MSSQL_PID: Developer
     ports:
-      - "3306:3306"
+      - "1433:1433"
     volumes:
-      - db_data:/var/lib/mysql
-      - ./database/01_CreateDatabase.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - db_data:/var/opt/mssql
+      - ./database/01_CreateDatabase.sql:/scripts/01_init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${SA_PASSWORD}" -C -Q "SELECT 1" || exit 1
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 15
+      start_period: 40s
     networks:
       - softline_net
 
@@ -32,7 +31,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
       JWT_KEY: ${JWT_KEY}
-      DB_CONNECTION_STRING: server=db;port=3306;database=SoftLineTeste;user=${MYSQL_USER};password=${MYSQL_PASSWORD};
+      DB_CONNECTION_STRING: Server=db;Database=SoftLineTeste;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=False;
     ports:
       - "8080:8080"
     depends_on:
